@@ -8,7 +8,26 @@ import (
 	"strings"
 )
 
+// Declare a global map
+var Commands map[string]cliCommand
+
+func initializeMap() {
+	Commands = map[string]cliCommand{
+		"exit": {
+			name:        "exit",
+			description: "exit the pokedex",
+			callback:    commandExit,
+		},
+		"help": {
+			name:        "help",
+			description: "display a help message",
+			callback:    commandHelp,
+		},
+	}
+}
+
 func main() {
+	initializeMap()
 	scanner := bufio.NewScanner(os.Stdin)
 
 	for {
@@ -16,7 +35,14 @@ func main() {
 		if scanner.Scan() {
 			userInput := scanner.Text()
 			cleaned := cleanInput(userInput)
-			fmt.Printf("Your command was: %s\n", cleaned[0])
+
+			command, ok := Commands[cleaned[0]]
+
+			if !ok {
+				fmt.Println("Unknown command")
+				continue
+			}
+			command.callback()
 		}
 
 	}
